@@ -1,6 +1,6 @@
-import curses
+import curses, curses.panel
+from collections.abc import Callable
 from enum import IntEnum, auto
-
 
 
 class DisplayColor(IntEnum):
@@ -26,7 +26,7 @@ class Display:
 
     input_windows: "_CursesWindow"
 
-    listening: bool # Break bool for listening user input
+    listening: bool  # Break bool for listening user input
 
     def __init__(self):
         """
@@ -49,7 +49,6 @@ class Display:
             curses.init_pair(DisplayColor.DEBUG, curses.COLOR_YELLOW, -1)
             curses.init_pair(DisplayColor.LOG, curses.COLOR_WHITE, -1)
 
-
         self.color_variation = {DisplayColor.CLASSIC: 0,
                                 DisplayColor.PROMPT: 0, DisplayColor.SUCCESS: curses.A_BOLD,
                                 DisplayColor.DEBUG: 0, DisplayColor.ERROR: curses.A_BOLD,
@@ -62,7 +61,7 @@ class Display:
         self.height = curses.LINES
         self.listening = False
 
-    def _display(self, text: str, height: int, start: int = 0, color: DisplayColor | int = 0, refresh: bool = True):
+    def display(self, text: str, height: int, start: int = 0, color: DisplayColor | int = 0, refresh: bool = True):
         """
         Display text at position
         :param text: Text to display
@@ -71,7 +70,8 @@ class Display:
         :param color: Text variation
         :param refresh: Refresh window
         """
-        self.stdscr.addstr(height, start, text, curses.color_pair(color) if isinstance(color , int) else self.color_variation[color])
+        self.stdscr.addstr(height, start, text,
+                           curses.color_pair(color) if isinstance(color, int) else self.color_variation[color])
         if refresh:
             self._refresh()
 
@@ -97,11 +97,7 @@ class Display:
         self.stdscr.keypad(False)
         curses.endwin()
 
-
-    def input(self, char: int):
-        raise NotImplementedError()
-
-    def start_listening(self):
+    def start_listening(self, onkey: Callable):
         """
         Start listening to user input
         """
@@ -112,4 +108,7 @@ class Display:
             if char == -1:
                 pass
             else:
-                self.input(char)
+                onkey(char)
+
+    def clear(self):
+        self.input_windows.clear()
