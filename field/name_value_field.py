@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from client.page.client_page import ClientPage
 from field.selectable_field import SelectableField
@@ -13,7 +13,7 @@ class NameValueField(SelectableField):
     """
 
     PLACEHOLDER_NAME = " "
-    DEFAULT_NAME_SIZE = 10
+    DEFAULT_NAME_SIZE = 14
     PLACEHOLDER_VALUE = "_"
     DEFAULT_VALUE_SIZE = 20
     DEFAULT_VALUE_NAME_SPACE = 4

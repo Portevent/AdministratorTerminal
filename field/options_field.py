@@ -45,7 +45,7 @@ class OptionsField(NameValueField):
         self.values_count = len(self._values)
 
     def __init__(self, origin_x: int, origin_y: int, page: ClientPage, name: str, values: List[str], default_index: int = 0, loop: bool = True):
-        super().__init__(x=origin_x, y=origin_y, page=page, name=name, value="")
+        super().__init__(x=origin_x, y=origin_y, page=page, name=name, value="", max_value_size=max(len(x) for x in values)+4)
         self.loop = loop
         self.values = values
         self.index = default_index

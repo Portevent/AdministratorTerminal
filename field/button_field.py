@@ -1,8 +1,7 @@
-from typing import Callable, override
+from typing import override, Callable
 
 from client.page.client_page import ClientPage
 from field.name_value_field import NameValueField
-from field.selectable_field import SelectableField
 
 
 class ButtonField(NameValueField):
