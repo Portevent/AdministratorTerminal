@@ -1,0 +1,1 @@
+# This script handles the notifications from the server and the printing of those
