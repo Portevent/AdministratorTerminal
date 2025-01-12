@@ -6,6 +6,9 @@ from forms.form import Form
 
 
 class IncidentReportForm(Form):
+    """
+    Incident Report, with location, title, priority and an optional proposal
+    """
 
     form_id = 1
     form_ver = 1
@@ -16,39 +19,27 @@ class IncidentReportForm(Form):
     proposal: str | None
     priority: int
 
-    def serialise(self) -> str:
+    def serialize(self) -> str:
         serialised = bytes()
 
         serialised += self.getSignature()
 
-        serialised += self._serialiseString(self.reportSourceID)
-        serialised += self._serialiseString(self.location)
-        serialised += self._serialiseString(self.issueTitle)
-        serialised += self._serialiseString(self.proposal)
+        serialised += self._serializeString(self.reportSourceID)
+        serialised += self._serializeString(self.location)
+        serialised += self._serializeString(self.issueTitle)
+        serialised += self._serializeString(self.proposal)
         serialised += self._serialiseInt(self.priority)
 
         return base64.b64encode(serialised).decode()
 
     @classmethod
-    def deserialise(cls, serialised: str, buffer=None) -> Self:
-        if buffer is None:
-            buffer = base64.b64decode(serialised)
-
-        super().deserialise(serialised, buffer=buffer)
-
-
+    def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
-        last_index = 6
 
-        (res.reportSourceID, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.location, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.issueTitle, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.proposal, size) = cls._deserialiseString(buffer, last_index, optionnal=True)
-        last_index += size
-        (res.priority, size) = cls._deserialiseInt(buffer, last_index)
-
+        res.reportSourceID, index = cls._deserializeString(buffer, index)
+        res.location, index = cls._deserializeString(buffer, index)
+        res.issueTitle, index = cls._deserializeString(buffer, index)
+        res.proposal, index = cls._deserializeString(buffer, index, optionnal=True)
+        res.priority, index = cls._deserializeInt(buffer, index)
 
         return res

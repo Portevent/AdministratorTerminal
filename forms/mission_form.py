@@ -6,7 +6,9 @@ from forms.form import Form
 
 
 class MissionForm(Form):
-
+    """
+    Mission Form, with an assigned, a location, a name, a description and a priority. May have a task.
+    """
     form_id = 2
     form_ver = 1
 
@@ -17,42 +19,29 @@ class MissionForm(Form):
     tasks: str | None
     priority: int
 
-    def serialise(self) -> str:
+    def serialize(self) -> str:
         serialised = bytes()
 
         serialised += self.getSignature()
 
-        serialised += self._serialiseString(self.assigned_id)
-        serialised += self._serialiseString(self.location)
-        serialised += self._serialiseString(self.name)
-        serialised += self._serialiseString(self.description)
-        serialised += self._serialiseString(self.tasks)
+        serialised += self._serializeString(self.assigned_id)
+        serialised += self._serializeString(self.location)
+        serialised += self._serializeString(self.name)
+        serialised += self._serializeString(self.description)
+        serialised += self._serializeString(self.tasks)
         serialised += self._serialiseInt(self.priority)
 
         return base64.b64encode(serialised).decode()
 
-    @classmethod
-    def deserialise(cls, serialised: str, buffer=None) -> Self:
-        if buffer is None:
-            buffer = base64.b64decode(serialised)
-
-        super().deserialise(serialised, buffer=buffer)
-
-
+    @classmethod   
+    def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
-        last_index = 6
-
-        (res.assigned_id, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.location, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.name, size) = cls._deserialiseString(buffer, last_index)
-        last_index += size
-        (res.description, size) = cls._deserialiseString(buffer, last_index, optionnal=True)
-        last_index += size
-        (res.tasks, size) = cls._deserialiseString(buffer, last_index, optionnal=True)
-        last_index += size
-        (res.priority, size) = cls._deserialiseInt(buffer, last_index)
-
+        
+        res.assigned_id, index = cls._deserializeString(buffer, index)
+        res.location, index = cls._deserializeString(buffer, index)
+        res.name, index = cls._deserializeString(buffer, index)
+        res.description, index = cls._deserializeString(buffer, index, optionnal=True)
+        res.tasks, index = cls._deserializeString(buffer, index, optionnal=True)
+        res.priority, index = cls._deserializeInt(buffer, index)
 
         return res
