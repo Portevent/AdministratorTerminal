@@ -4,16 +4,17 @@ from client.page.client_page import ClientPage
 from field.name_value_field import NameValueField
 
 
-class ButtonField(NameValueField):
+@HideCursor
+class ButtonField(VisualField):
     """
     Simple button field that use a callback when it is interacted
     """
 
-    has_cursor = False
     callback: Callable
 
-    def __init__(self, origin_x: int, origin_y: int, page: ClientPage, name: str, callback: Callable):
-        super().__init__(name=name, x=origin_x, y=origin_y, page=page, value="pristine")
+    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
+                name: str, label: str | None = None, callback: Callable):
+        super().__init__(page, x, y, width, height, name, label)
         self.callback = callback
 
     def inputChar(self, char: str):
@@ -50,6 +51,6 @@ class ButtonField(NameValueField):
         return ""
 
     @property
-    def formatedName(self) -> str:
-        return f"[{self.name}]"
+    def formatedLabel(self) -> str:
+        return f"[{self.label}]"
 

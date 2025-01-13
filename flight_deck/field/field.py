@@ -1,136 +1,64 @@
-from abc import abstractmethod, ABC
-from collections.abc import Callable
+from abc import abstractmethod
 
 from client.page.client_page import ClientPage
+from field.selectable_field import SelectableField
 from utils.colors import Color
+from utils.text_formater import TextFormater
 
 
-class Field(ABC):
+class Field(Element):
     """
-    Field represent a field than can be interacted with
-    It has it own area where it can write text into
+    Element that has an name, a label and a value
     """
 
-    # Display to use
-    page: ClientPage
+    name: str
+    _label: str
+    _value: str
+    current_size: int = 0 # Size of the current value
+    
+    @property
+    def value(self) -> str:
+        return self._value
 
-    # Origin point of the display, to write in the right area within the display
-    origin_x: int
-    origin_y: int
+    @value.setter
+    def value(self, value: str):
+        self._value = value
+        self.current_size = len(value)
+        self.displayValue()
 
-    # Callables to write text & move cursor
-    _writer: Callable | None
-    _cursor: Callable | None
+    @property
+    def label(self) -> str:
+        return self._label
 
-    def __init__(self, x: int, y: int, page: ClientPage):
-        self.origin_x = x
-        self.origin_y = y
-        self.page = page
-        self._writer = None
-        self._cursor = None
+    @label.setter
+    def label(self, label: str):
+        self._label = label
+        self.displayLabel()
 
-    def set_writer(self, writer: Callable | None):
-        self._writer = writer
+    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int = 0, height: int = 0, name: str, label: str | None = None, value: str = ""):
+        super().__init__(page, x, y, width, height)
+        self.name = name
+        self.label = label or self.name
+        self.value = value
 
-    def set_cursor(self, cursor: Callable | None):
-        self._cursor = cursor
-
-    def write(self, text: str, height: int, start: int = 0, color: Color | int = 0, refresh: bool = True):
-        """
-        Write text in the field area
-        :param text:
-        :param height:
-        :param start:
-        :param color:
-        :param refresh:
-        :return:
-        """
-        if self._writer:
-            self._writer(text, self.origin_y + height, self.origin_x + start, color, refresh)
-
-    def moveCursor(self, x: int, y: int):
-        """
-        Move cursor within the display area
-        :param x: X coordinate
-        :param y: Y coordinate
-        """
-        if self._cursor:
-            self._cursor(self.origin_x + x, self.origin_y + y)
-
-    @abstractmethod
-    def inputChar(self, char: str):
-        """
-        Character is inputted in the field
-        :param char: Inputed char
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def goLeft(self):
-        """
-        Going left is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def goRight(self):
-        """
-        Going right is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def enter(self):
-        """
-        Enter key is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def start(self):
-        """
-        Start key is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def end(self):
-        """
-        End key is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def delete(self):
-        """
-        Delete key is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def suppr(self):
-        """
-        Suppr key is inputted in the field
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def select(self):
-        """
-        Field is being selected
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def unselect(self):
-        """
-        Field is being unselected
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def display(self):
-        """
-        Display the field
-        """
+        self.displaylabel()
+        self.displayValue()
+
+    @abstractmethod
+    def displayLabel(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def displayValue(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def formatedLabel(self) -> str:
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def formatedValue(self) -> str:
         raise NotImplementedError

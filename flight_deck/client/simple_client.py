@@ -9,7 +9,9 @@ from display.display import Display
 
 class SimpleClient(Client):
     """
-    Simple client that has a home screen and basic logic
+    Simple client that has page logic.
+    Can register Page, and has navigateTo to go to certain pages
+    Onkey redirect the event to the current_page
     """
     pages: Dict[str, ClientPage]
 
@@ -31,7 +33,8 @@ class SimpleClient(Client):
         self.pages[page.name] = page
 
     def onkey(self, key: str):
-        self.current_page.onkey(key)
+        if self.current_page:
+            self.current_page.onkey(key)
 
     def navigateTo(self, name: str):
         if self.current_page:

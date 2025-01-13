@@ -8,6 +8,7 @@ class Client:
     """
     Client that has a display a windows and listen its input
     """
+    
     display: Display
 
     def __init__(self, display: Display):
