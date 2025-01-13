@@ -5,10 +5,10 @@ import pdf417
 
 class DefaultFormat:
     @staticmethod
-    def custom_center(buff: str, width: int = 42, border: int = 0, dash:str = "-"):
+    def custom_center(text: str, width: int = 42, border: int = 0, dash:str = "-"):
         """
         Centers the buffer within equal sized dashed lines
-        :param buff: Buffer to center
+        :param text: Buffer to center
         :param width: Width of the page
         :param border: Border left and right of the lines
         :param dash: Dash character
@@ -17,7 +17,7 @@ class DefaultFormat:
         # 123456789012345678901234567890123456789012
         #  ---------------- bonjour -------------- 
         #                  -- bLen--
-        b_len = len(buff) + 2
+        b_len = len(text) + 2
 
         r_width = width - 2 * border
         n_dash = r_width - b_len
@@ -25,21 +25,21 @@ class DefaultFormat:
         r_pad = n_dash // 2
         l_pad = r_pad + n_dash % 2
 
-        return " " * border + dash * r_pad + " " + buff + " " + dash * l_pad
+        return " " * border + dash * r_pad + " " + text + " " + dash * l_pad
 
 
     @staticmethod
-    def format_long(buff: str, max_len: int = 42, first_len: int = 42):
+    def format_long(text: str, max_len: int = 42, first_len: int = 42):
         """
         Formats a long text by splitting it into multiple lines according to a fixed wisth so that no words are cut
-        :param buff: Buffer to format
+        :param text: Buffer to format
         :param max_len: Max length of the output
         :param first_len: First length of the output (In case of set title, with different format)
         """
         line_index = 0
         out = [""]
 
-        for word in buff.split(" "):
+        for word in text.split(" "):
             if (len(out[line_index]) + len(word) + 1 > max_len and line_index > 0) or (len(out[line_index]) + len(word) + 1 > first_len and line_index == 0):
                 out.append("")
                 line_index += 1
@@ -55,30 +55,30 @@ class DefaultFormat:
         return " " + "\n ".join(out)
 
     @staticmethod
-    def print_center(printer: ThermalPrinter, buff: str, width: int = 42, border: int = 0, dash: str = '-'):
+    def print_center(printer: ThermalPrinter, text: str, width: int = 42, border: int = 0, dash: str = '-'):
         """
         Prints a text in the center, falling back to default settings
         :param printer: Printer
-        :param buff: Buffer to print
+        :param text: Buffer to print
         :param width: Width of the page
         :param border: Border left and right of the lines
         :param dash: Dash character
         """
 
         printer.set_with_default(align="center")
-        printer.text(DefaultFormat.custom_center(buff, width=width, border=border, dash=dash) + "\n")
+        printer.text(DefaultFormat.custom_center(text, width=width, border=border, dash=dash) + "\n")
 
         printer.set_with_default()
 
 
     @staticmethod
-    def print_pdf417(printer: ThermalPrinter, buff: str):
+    def print_pdf417(printer: ThermalPrinter, payload: str):
         """
         Print a formatted pdf417 barcode
         :param printer: Printer
-        :param buff: Buffer to print
+        :param payload: Payload of the barcode
         """
-        code = pdf417.encode(buff, columns=4)
+        code = pdf417.encode(payload, columns=4)
         image = pdf417.render_image(code)
 
         printer.text("\n")
