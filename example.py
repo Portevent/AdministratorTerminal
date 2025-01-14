@@ -1,13 +1,10 @@
 import mission
-from client.page.form_page import FormPage
-from client.simple_client import SimpleClient
-from display.display import Display
-
-from field import DateField, TextField, OptionsField, ButtonField
+from flight_deck import Client, ClientPage, FormPage
+from flight_deck.elements Paragraph, Logo, DateField, TextField, OptionsField, ButtonField
 
 p = mission.init_printer()
 
-def submit():
+def send_print_order(values: Dict[str, str]):
     """
     Callback when button is clicked
     """
@@ -24,17 +21,38 @@ def submit():
 
 AGENTS = ["PPORTE-E-0972D (Gestalt)", "STAR-L0704 (Replika)"]
 
-form = FormPage("message", [
-        DateField(0,0, None , "Filling date", "10012025"),
-        OptionsField(0, 0, None, "Full source ID", AGENTS, loop=False),
-        OptionsField(0, 0, None, "Full dest ID", AGENTS, loop=False),
-        OptionsField(0, 0, None, "Location", ["Kuisine", "Salon", "Chambre"]),
-        TextField(0,0, None , "Object", "", max_size=20),
-        TextField(0,0, None , "Description", ""),
-        ButtonField(0, 0, None, "Send", callback=submit)
-    ], actions={})
 
-with SimpleClient([], Display()) as client:
-    client.addPage(form)
-    client.navigateTo("message")
-    client.start()
+with Client(Display()) as client:
+
+    # Create the home page
+    home = ClientPage(name="home")
+
+    home.appendElement(Paragraph(text="Flight Deck"))
+    home.appendElement(Logo())
+    home.appendElement(ButtonField(name="new_mission", label="New Mission", value="mission", callback=client.navigateTo))
+
+
+    # Create the form page
+    mission = FormPage(name="mission", onSubmit=send_print_order)
+
+    elements = [
+        Paragraph(text="New Mission"),
+        DateField(name="filling_date", label="Date", value="10012025"),
+        OptionsField(name="full_source_ID", label="Source", values=AGENTS, loop=False),
+        OptionsField(name="full_dest_id", label="Destination", values=AGENTS, loop=False),
+        OptionsField(name="location", label="Location", values=["Kuisine", "Salon", "Chambre"]),
+        TextField(name="object", max_size=20),
+        TextField(name="description"),
+        ButtonField(name="back_button", label="Cancel", value="home", callback=client.navigateTo)
+    ]
+
+    for element in elements:
+        mission.appendElement(element)
+
+
+    # Register pages
+    client.addPage(home)
+    client.addPage(mission)
+
+    # Start client
+    client.start("home")

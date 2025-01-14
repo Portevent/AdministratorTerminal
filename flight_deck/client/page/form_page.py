@@ -19,6 +19,7 @@ class FormPage(ClientPage):
 
     def appendElement(self, element: Element):
         element.y = self.height
+        element.page = self
         self.height += element.height
         self.elements.append(element, -1)
         self.updateSubmitFieldPosition()

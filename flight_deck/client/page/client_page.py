@@ -13,6 +13,9 @@ class ClientPage(ABC):
 
     height: int
 
+    # Index of the selected field
+    selectedIndex: int = None
+
     visible: bool
 
     def __init__(self, name: str):
@@ -21,9 +24,6 @@ class ClientPage(ABC):
         self.elements = []
         self.height = 0
         self.visible = False
-
-    # Index of the selected field
-    selectedIndex: int = None
 
     @property
     def selected_element(self) -> Element:
@@ -35,6 +35,7 @@ class ClientPage(ABC):
 
     def appendElement(self, element: Element):
         element.y = self.height
+        element.page = self
         self.height += element.height
         self.elements.append(element)
 
@@ -42,23 +43,33 @@ class ClientPage(ABC):
     def onkey(self, char: str):
         raise NotImplementedError
 
-    @abstractmethod
     def _display(self):
         """
         Display the page
-        :return:
         """
         raise NotImplementedError
 
     def display(self):
-        if self.client is None:
-            raise Exception(
-                f"Trying to display Client page {self.name} without it being within a client. \n Missing client.addPage(clientPage)")
+        """
+        Display the page
+        """
+        if self.visible:
+            self._display()
 
-        if not self.visible:
-            return
+    def show(self):
+        """
+        Make this page visible and display it
+        """
+        self.visible = True
+        self.display()
 
-        self._display()
+    def hide(self):
+        """
+        Hide this page
+        """
+        self.visible = False
+        if self.client:
+            self.client.display.clear()
 
     def selectElement(self, index: int):
         """
@@ -113,3 +124,11 @@ class ClientPage(ABC):
 
         elif chr(char) in self.selected_element.VALID_CHAR:
             self.selected_field.inputChar(chr(char))
+
+    def navigateTo(self, destination: str):
+        """
+        Navigate to
+        :param destination: destination
+        """
+        if self.client:
+            self.client.navigateTo(destination)
