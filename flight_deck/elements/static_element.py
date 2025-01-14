@@ -1,6 +1,9 @@
 from abc import abstractmethod, ABC
 
-@SetValidChar("")
+from flight_deck.elements.element import Element
+
+
+# @SetValidChar("")
 class StaticElement(Element, ABC):
     """
     StaticElement are elements that doesn't respond to user input

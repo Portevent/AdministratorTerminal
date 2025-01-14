@@ -1,8 +1,9 @@
+import curses
 from abc import ABC, abstractmethod
-from collections.abc import Callable
-from typing import Dict
+from typing import List
 
-from client.client import Client
+from flight_deck.elements.element import Element
+from flight_deck.client.client import Client
 
 
 class ClientPage(ABC):
@@ -24,6 +25,7 @@ class ClientPage(ABC):
         self.elements = []
         self.height = 0
         self.visible = False
+        self.selectedIndex = 0
 
     @property
     def selected_element(self) -> Element:
@@ -35,19 +37,16 @@ class ClientPage(ABC):
 
     def appendElement(self, element: Element):
         element.y = self.height
-        element.page = self
+        element.setWriter(self.writer, self.moveCursor)
         self.height += element.height
         self.elements.append(element)
-
-    @abstractmethod
-    def onkey(self, char: str):
-        raise NotImplementedError
 
     def _display(self):
         """
         Display the page
         """
-        raise NotImplementedError
+        for element in self.elements:
+            element.display()
 
     def display(self):
         """
@@ -77,14 +76,14 @@ class ClientPage(ABC):
         :param index: Index of the Element
         """
         if self.selectedIndex:
-            self.selected_field.unselect()
+            self.selected_element.unselect()
 
         self.selectedIndex = index
-        self.selected_field.select()
+        self.selected_element.select()
 
         
     def nextElement(self):
-        if self.selectedIndex < len(self.fields) - 1:
+        if self.selectedIndex < len(self.elements) - 1:
             self.selectElement(self.selectedIndex + 1)
 
     def previousElement(self):
@@ -92,21 +91,23 @@ class ClientPage(ABC):
             self.selectElement(self.selectedIndex - 1)
             
     def onkey(self, char: int):
+        if self.selectedIndex is None:
+            return
 
         if char == 0xa:  # Enter key
-            self.selected_field.enter()
+            self.selected_element.enter()
 
         elif char == curses.KEY_LEFT:
-            self.selected_field.goLeft()
+            self.selected_element.goLeft()
 
         elif char == curses.KEY_RIGHT:
-            self.selected_field.goRight()
+            self.selected_element.goRight()
 
         elif char == curses.KEY_UP:
-            self._previous_input()
+            self.previousElement()
 
         elif char == curses.KEY_DOWN:
-            self._next_input()
+            self.nextElement()
 
         elif char == curses.KEY_SR:  # Scroll ?up?
             pass
@@ -117,13 +118,13 @@ class ClientPage(ABC):
             # self.client.display.scroll(1)
 
         elif char == 8:  # Del key
-            self.selected_field.delete()
+            self.selected_element.delete()
 
         elif char == curses.KEY_DC:
-            self.selected_field.suppr()
+            self.selected_element.suppr()
 
         elif chr(char) in self.selected_element.VALID_CHAR:
-            self.selected_field.inputChar(chr(char))
+            self.selected_element.inputChar(chr(char))
 
     def navigateTo(self, destination: str):
         """
@@ -132,3 +133,11 @@ class ClientPage(ABC):
         """
         if self.client:
             self.client.navigateTo(destination)
+
+    def writer(self, text: str, height: int, start: int, color, refresh):
+        if self.visible:
+            self.client.display.write(text, height, start, color, refresh)
+
+    def moveCursor(self, x: int, y: int):
+        if self.visible:
+            self.client.display.moveCursor(x, y)

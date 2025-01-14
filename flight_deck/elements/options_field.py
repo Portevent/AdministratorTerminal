@@ -1,11 +1,11 @@
-import curses
 from typing import List
 
-from client.page.client_page import ClientPage
-from field.name_value_field import NameValueField
 
+from flight_deck.elements.visual_field import VisualField, HideCursor
+
+
+# @SetValidChar("")
 @HideCursor
-@SetValidChar("")
 class OptionsField(VisualField):
     """
     Simple option field, where its value can be selected with left and right keys
@@ -33,16 +33,18 @@ class OptionsField(VisualField):
         self.value = self.values[self._index]
 
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
-                name: str, label: str | None = None, 
-                values: List[str], loop: bool = True, index: int = 0):
-        super().__init__(page, x, y, width, height, name, label, value,
-            valueBackgroundSize=max(len(x) for x in values)+4)
-            
+    def __init__(self, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
+                name: str = "", label: str | None = None,
+                values: List[str] = [], loop: bool = True, index: int = 0):
+
         self.loop = loop
         self.values = values
-        self.values_count = len(self._values)
-        self.index = index
+        self.values_count = len(self.values)
+        self._index = index
+
+        super().__init__(x, y, width, height, name, label, values[index],
+            valueBackgroundSize=max(len(x) for x in values)+4)
+
 
     def inputChar(self, char: str):
         pass
@@ -69,6 +71,9 @@ class OptionsField(VisualField):
 
     def suppr(self):
         pass
+
+    def _generateValueBackground(self, size: int):
+        return " " * size
 
     @property
     def formatedValue(self) -> str:

@@ -1,6 +1,8 @@
 import curses, curses.panel
 from collections.abc import Callable
-from display import Display, DisplayColor
+
+from flight_deck.display.display import DisplayColor, Display
+
 
 class CursesDisplay(Display):
     """

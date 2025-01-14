@@ -1,16 +1,15 @@
 from abc import abstractmethod, ABC
-from collections.abc import Callable
+from typing import Callable
 
-from client.page.client_page import ClientPage
 from utils.colors import Color
 
 
-def SetValidChar(original_class, chars: str):
+def SetValidChar(cls, chars: str):
     """
     Class decorator to set valid characters
     """
-    original_class.VALID_CHAR = list(chars)
-    return original_class
+    cls.VALID_CHAR = list(chars)
+    return cls
 
 class Element(ABC):
     """
@@ -19,7 +18,8 @@ class Element(ABC):
     """
 
     # Display to use
-    page: ClientPage | None
+    writer: Callable | None
+    cursor: Callable | None
 
     # Origin point of the display, to write in the right area within the display
     x: int
@@ -31,10 +31,17 @@ class Element(ABC):
     # Char that can be entered in this element
     VALID_CHAR = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/. -\'()<>éèà:^*_')
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int = 0, height: int = 0):
+    def __init__(self, x: int = 0, y: int = 0, width: int = 0, height: int = 0):
         self.x = x
         self.y = y
-        self.page = page
+        self.height = height
+        self.width = width
+        self.writer = None
+        self.cursor = None
+
+    def setWriter(self, writer, cursor):
+        self.writer = writer
+        self.cursor = cursor
 
     def write(self, text: str, height: int, start: int = 0, color: Color | int = 0, refresh: bool = True):
         """
@@ -46,8 +53,8 @@ class Element(ABC):
         :param refresh:
         :return:
         """
-        if self.page:
-            self.page.write(text, self.x + height, self.y + start, color, refresh)
+        if self.writer:
+            self.writer(text, self.y + height, self.x + start, color, refresh)
 
     def moveCursor(self, x: int, y: int):
         """
@@ -55,8 +62,8 @@ class Element(ABC):
         :param x: X coordinate
         :param y: Y coordinate
         """
-        if self.page:
-            self.page.moveCursor(self.origin_x + x, self.origin_y + y)
+        if self.cursor:
+            self.cursor(self.x + x, self.y + y)
 
     @abstractmethod
     def display(self):

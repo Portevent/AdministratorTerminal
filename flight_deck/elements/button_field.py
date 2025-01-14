@@ -1,7 +1,6 @@
 from typing import override, Callable
 
-from client.page.client_page import ClientPage
-from field.name_value_field import NameValueField
+from flight_deck.elements.visual_field import VisualField, HideCursor
 
 
 @HideCursor
@@ -12,9 +11,9 @@ class ButtonField(VisualField):
 
     callback: Callable
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
-                name: str, label: str | None = None, callback: Callable):
-        super().__init__(page, x, y, width, height, name, label)
+    def __init__(self, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
+                name: str = "", label: str | None = None, value: str = "", callback: Callable = None):
+        super().__init__(x, y, width, height, name, label, value)
         self.callback = callback
 
     def inputChar(self, char: str):
@@ -27,8 +26,7 @@ class ButtonField(VisualField):
         pass
 
     def enter(self):
-        self.value = "clicked"
-        self.callback()
+        self.callback(self)
 
     def start(self):
         pass

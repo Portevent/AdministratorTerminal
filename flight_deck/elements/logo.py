@@ -1,18 +1,21 @@
+from flight_deck.elements.static_element import StaticElement
+
+
 class Logo(StaticElement):
     """
     //--\\
     ||  ||
     \\__//
-    """"
+    """
 
     text: str
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0):
-        super().__init__(page, x, y, 6, 3)
+    def __init__(self, x: int = 0, y: int = 0):
+        super().__init__(x, y, 6, 3)
 
     def display(self):
-        self.write("//--\\", 0, 0)
-        self.write("||  ||", 0, 1)
-        self.write("\\__//", 0, 2)
+        self.write("//--\\\\", 0, 0)
+        self.write("||  ||", 1, 0)
+        self.write("\\\\__//", 2, 0)
 
         

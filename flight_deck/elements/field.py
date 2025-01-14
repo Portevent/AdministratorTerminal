@@ -1,9 +1,6 @@
 from abc import abstractmethod
 
-from client.page.client_page import ClientPage
-from field.selectable_field import SelectableField
-from utils.colors import Color
-from utils.text_formater import TextFormater
+from flight_deck.elements.element import Element
 
 
 class Field(Element):
@@ -35,14 +32,14 @@ class Field(Element):
         self._label = label
         self.displayLabel()
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int = 0, height: int = 0, name: str, label: str | None = None, value: str = ""):
-        super().__init__(page, x, y, width, height)
+    def __init__(self, x: int = 0, y: int = 0, width: int = 0, height: int = 0, name: str = "", label: str | None = None, value: str = ""):
+        super().__init__(x, y, width, height)
         self.name = name
         self.label = label or self.name
         self.value = value
 
     def display(self):
-        self.displaylabel()
+        self.displayLabel()
         self.displayValue()
 
     @abstractmethod

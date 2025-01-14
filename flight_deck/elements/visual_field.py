@@ -1,7 +1,9 @@
 import curses
 from abc import ABC
 
-from field.field import Field
+from flight_deck.elements.field import Field
+from utils.colors import Color
+
 
 def HideCursor(original_class):
     """
@@ -41,7 +43,7 @@ class VisualField(Field, ABC):
         self._focused = focus
         if self.focused:
             curses.curs_set(1 if self._CURSOR_VISIBLE else 0)
-        self.display_focus()
+        self.displayFocus()
 
     # Cursor position within the value
     _cursorPosition: int
@@ -55,20 +57,21 @@ class VisualField(Field, ABC):
         self._cursorPosition = position
         self.displayCursor()
 
-    def __init__(self, page: ClientPage | None = None, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
-                name: str, label: str | None = None, value: str = "",
+    def __init__(self, x: int = 0, y: int = 0, width: int | None = None, height: int | None = None,
+                name: str = "", label: str | None = None, value: str = "",
                 labelBackgroundSize: int | None = None, valueBackgroundSize: int | None = None):
-        super().__init__(page, x, y, width or self._DEFAUL_WIDTH, height or self._DEFAUL_HEIGTH, name, label, value)
-        self._generateLabelAndValuePosition(labelBackgroundSize or self.VALUE_POSITION, valueBackgroundSize or len(self.value))
+        self._generateLabelAndValuePosition(labelBackgroundSize or self._VALUE_POSITION, valueBackgroundSize or len(value))
+        self._focused = False
+        super().__init__(x, y, width or self._DEFAUL_WIDTH, height or self._DEFAUL_HEIGTH, name, label, value)
         self.cursorPosition = self.current_size
 
     def _generateLabelAndValuePosition(self, labelSize: int, valueSize: int):
         self.labelBackground = self._generateLabelBackground(labelSize)
         self.labelPosition = (2, 0)
         self.valueBackground = self._generateValueBackground(valueSize)
-        self.valuePosition = (2 + len(labelBackground), 0)
+        self.valuePosition = (2 + len(self.labelBackground), 0)
 
-    def _generatelabelBackground(self, size: int):
+    def _generateLabelBackground(self, size: int):
         return " " * size
 
     def _generateValueBackground(self, size: int):
@@ -90,15 +93,15 @@ class VisualField(Field, ABC):
         self.write(">" if self.focused else " ", 0, 0)
 
     def displayLabel(self):
-        self.write(self.labelBackground, self.labelPosition[0], self.labelPosition[1], color=Color.CLASSIC)
-        self.write(self.formatedLabel, self.labelPosition[0], self.labelPosition[1], color=Color.CLASSIC)
+        self.write(self.labelBackground, self.labelPosition[1], self.labelPosition[0], color=Color.CLASSIC)
+        self.write(self.formatedLabel, self.labelPosition[1], self.labelPosition[0], color=Color.CLASSIC)
 
     def displayValue(self):
-        self.write(self.valueBackground, self.valuePosition[0], self.valuePosition[1], color=Color.CLASSIC)
-        self.write(self.formatedValue, self.valuePosition[0], self.valuePosition[1], color=Color.CLASSIC)
+        self.write(self.valueBackground, self.valuePosition[1], self.valuePosition[0], color=Color.CLASSIC)
+        self.write(self.formatedValue, self.valuePosition[1], self.valuePosition[0], color=Color.CLASSIC)
 
     def displayCursor(self):
-        self.moveCursor(self.valuePosition[0] + self.curserPosition, self.valuePosition[1])
+        self.moveCursor(self.valuePosition[0] + self.cursorPosition, self.valuePosition[1])
 
     @property
     def formatedLabel(self) -> str:
