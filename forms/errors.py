@@ -1,8 +1,11 @@
 class FormatError(Exception):
     pass
 
-class WrongFormError(Exception):
+class FormDeserialisationError(Exception):
     pass
 
-class WrongFormVersionError(Exception):
+class WrongFormError(FormDeserialisationError):
+    pass
+
+class WrongFormVersionError(FormDeserialisationError):
     pass
