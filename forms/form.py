@@ -58,6 +58,24 @@ class Form(ABC):
         raise NotImplementedError
 
     @classmethod
+    def _getSignature(cls, buffer: bytes = None, index: int = 0) -> (int, int, int):
+        if chr(buffer[index]) != "F":
+            raise FormatError("The form data isn't starting with an F :(")
+
+        index += 1
+        unpacked_form_id, index = cls._deserializeInt(buffer, index)
+        unpacked_form_ver, index = cls._deserializeInt(buffer, index)
+
+        return unpacked_form_id, unpacked_form_ver, index
+
+    @classmethod
+    def tryGetSignature(cls, buffer: bytes = None, index: int = 0) -> (bool, int, int, int):
+        try:
+            return True, cls._getSignature(buffer, index)
+        except FormatError:  # FormatError and deserialise Error
+            return False, 0, 0, index
+
+    @classmethod
     def checkSignature(cls, buffer: bytes = None, index: int = 0) -> (bool, int):
         """
         Check signature
@@ -66,12 +84,7 @@ class Form(ABC):
         :return: bool if signature is okay, and integer for the index where the signature ends
         """
 
-        if chr(buffer[index]) != "F":
-            raise FormatError("The form data isn't starting with an F :(")
-
-        index = 1
-        unpacked_form_id, index = cls._deserializeInt(buffer, index)
-        unpacked_form_ver, index = cls._deserializeInt(buffer, index)
+        unpacked_form_id, unpacked_form_ver, index = cls._getSignature(buffer, index)
 
         if unpacked_form_id != cls.form_id:
             raise WrongFormError
