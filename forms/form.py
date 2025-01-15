@@ -42,7 +42,11 @@ class Form(ABC):
 
         buffer = base64.b64decode(serialised)
 
-        signatureOk, index = cls.checkSignature(buffer)
+        return cls.deserialiseFromBytes(buffer)
+
+    @classmethod
+    def deserialiseFromBytes(cls, buffer: bytes) -> Self:
+        signature_ok, index = cls.checkSignature(buffer)
 
         return cls._unpack(buffer, index)
 
