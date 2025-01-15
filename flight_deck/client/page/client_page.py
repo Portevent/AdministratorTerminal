@@ -8,7 +8,6 @@ from flight_deck.client.client import Client
 
 class ClientPage(ABC):
 
-    name: str
     client: Client | None
     elements: List[Element]
 
@@ -19,8 +18,7 @@ class ClientPage(ABC):
 
     visible: bool
 
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self):
         self.client = None
         self.elements = []
         self.height = 0

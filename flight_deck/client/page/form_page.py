@@ -11,8 +11,8 @@ class FormPage(ClientPage):
     submitField: ButtonField
     onSubmitCallback: Callable
 
-    def __init__(self, name: str, onSubmit: Callable):
-        super().__init__(name)
+    def __init__(self, onSubmit: Callable):
+        super().__init__()
         self.submitField = ButtonField(name="__submit__", label="SUBMIT", callback=self.submit)
         self.submitField.setWriter(self.writer, self.moveCursor)
         self.elements = [self.submitField]

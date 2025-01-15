@@ -8,8 +8,6 @@ class Logo(StaticElement):
     \\__//
     """
 
-    text: str
-
     def __init__(self, x: int = 0, y: int = 0):
         super().__init__(x, y, 6, 3)
 

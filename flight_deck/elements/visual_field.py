@@ -4,7 +4,6 @@ from abc import ABC
 from flight_deck.elements.field import Field
 from utils.colors import Color
 
-
 def HideCursor(original_class):
     """
     Class decorator to hide cursor

@@ -4,12 +4,15 @@ from typing import Callable
 from utils.colors import Color
 
 
-def SetValidChar(cls, chars: str):
+def SetValidChar(chars: str):
     """
     Class decorator to set valid characters
     """
-    cls.VALID_CHAR = list(chars)
-    return cls
+    def wrapper(cls):
+        cls.VALID_CHAR = list(chars)
+        return cls
+
+    return wrapper
 
 class Element(ABC):
     """

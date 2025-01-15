@@ -14,7 +14,7 @@ class SimpleClient(Client):
     pages: Dict[str, ClientPage]
     current_page_name: str | None
 
-    def __init__(self, display: Display):
+    def __init__(self, display: Display | None = None):
         super().__init__(display)
         self.pages = {}
         self.current_page_name = None
@@ -31,9 +31,9 @@ class SimpleClient(Client):
             return None
         return self.pages[self.current_page_name]
 
-    def addPage(self, page: ClientPage):
+    def addPage(self, page: ClientPage, name: str):
         page.client = self
-        self.pages[page.name] = page
+        self.pages[name] = page
 
     def onkey(self, key: str):
         if self.current_page:
