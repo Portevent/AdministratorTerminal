@@ -1,6 +1,9 @@
 # This script handles the notifications from the server and the printing of those
+from time import sleep
+
 from forms.deserialiser import deserialiseFromEncoded
 from forms.errors import FormDeserialisationError
+from forms.mission_form import MissionForm
 
 from intercom.db.errors import DatabaseError, ServerResponseIncoherent
 from intercom.db.spatch import SpaTchDatabase
@@ -52,14 +55,34 @@ def retrieveAndPrint(ws_message: str, database: SpaTchDatabase, printer: Thermal
 
 
 if __name__ == "__main__":
-    printer_handle = ThermalPrinter()
+    printer_handle = ThermalPrinter.initialise(0x04b8, 0x0202, "TM-T88V")
 
-    ws_notif = WebSocketListener("ws://192.168.0.191:8080/")
+    ws_notif = WebSocketListener("ws://192.168.0.191:8000/notify?messages")
     ws_thread = ws_notif.initialise()
 
-    db = SpaTchDatabase("http://192.168.0.191:8080/")
+    db = SpaTchDatabase("http://192.168.0.191:8000/")
     db.checkConnection()
 
-    ws_notif.register_callback(lambda message: retrieveAndPrint(message, db, printer_handle))
+    def callback(message: str) -> None:
+        retrieveAndPrint(message, db, printer_handle)
+
+    ws_notif.register_callback(callback)
 
     ws_thread.start()
+
+    # ----- test
+
+    form = MissionForm()
+    form.assigned_id = "ass_test"
+    form.location = "loc_test"
+    form.name = "subject"
+    form.description = "desc example"
+    form.tasks = None
+    form.priority = 0
+
+    sleep(5)
+    print("Attempting to send a mission form")
+
+    serialised_form = form.serialize()
+
+    db.sendMessage(serialised_form)

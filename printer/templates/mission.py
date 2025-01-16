@@ -1,15 +1,15 @@
 from printer.driver import ThermalPrinter
 from printer.templates.format import DefaultFormat
-from template import Template
+from printer.templates.template import Template
 
 from forms.mission_form import MissionForm
 
 
 
-class MissionTemplate[T: MissionForm](Template):
+class MissionTemplate[T: MissionForm](Template[T]):
     document: T
 
-    def __print(self, printer: ThermalPrinter) -> None:
+    def _print(self, printer: ThermalPrinter) -> None:
         """
         Prints the Mission
         """
