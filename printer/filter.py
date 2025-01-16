@@ -7,8 +7,8 @@ from forms.mission_form import MissionForm
 class Filter:
     @staticmethod
     def templateFromDocument(document: Form) -> Template:
-        match type(document):
-            case MissionForm.__class__:
+        match document:
+            case MissionForm():
                 return MissionTemplate(document)
             case _:
                 raise NotImplementedError

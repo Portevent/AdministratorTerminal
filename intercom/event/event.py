@@ -1,8 +1,8 @@
-from typing import Callable
+from typing import Callable, List
 
 
 class EventListener[CT: Callable[[str], None]]:
-    callbacks: [[CT | None, bool]]
+    callbacks: List[List[CT | None | bool]]
 
     def __init__(self):
         self.callbacks = []
@@ -68,6 +68,10 @@ class EventListener[CT: Callable[[str], None]]:
         :param message: The message to propagate
         """
 
+        print("ola2")
+
         for (callback, enabled) in self.callbacks:
             if enabled and callback is not None:
+                print("ola3")
                 callback(message)
+                print("ola4")

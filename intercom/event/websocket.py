@@ -24,7 +24,7 @@ class WebSocketListener(EventListener):
 
         self.status = 1
 
-        print(f"-- on_open@ws: at {self.endpoint_url})")
+        print(f"-- on_open@ws: at {self.endpoint_url}")
 
     def on_close(self, socket: WebSocket, close_code: int, close_msg: str):
         """
@@ -41,6 +41,7 @@ class WebSocketListener(EventListener):
         Handles the websocket message event, wrapper for super().on_message since WebSocketApp requires
         Callable[[WebSocket, str], Any] and super().on_message is Callable[[str], None]
         """
+        print("ola")
         super().on_message(message)
 
     def on_error(self, error):
