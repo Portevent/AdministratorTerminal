@@ -68,10 +68,6 @@ class EventListener[CT: Callable[[str], None]]:
         :param message: The message to propagate
         """
 
-        print("ola2")
-
         for (callback, enabled) in self.callbacks:
             if enabled and callback is not None:
-                print("ola3")
                 callback(message)
-                print("ola4")
