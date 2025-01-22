@@ -80,9 +80,9 @@ if __name__ == "__main__":
     form.tasks = None
     form.priority = 0
 
-    sleep(5)
-    print("Attempting to send a mission form")
+    # sleep(5)
+    # print("Attempting to send a mission form")
 
-    serialised_form = form.serialize()
+    # serialised_form = form.serialize()
 
-    db.sendMessage(serialised_form)
+    # db.sendMessage(serialised_form)
