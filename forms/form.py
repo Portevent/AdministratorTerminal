@@ -75,8 +75,7 @@ class Form(ABC):
     @classmethod
     def tryGetSignature(cls, buffer: bytes = None, index: int = 0) -> (bool, int, int, int):
         try:
-            fid, fver, index = cls._getSignature(buffer, index)
-            return True, fid, fver, index
+            return True, *cls._getSignature(buffer, index)
         except FormatError:  # FormatError and deserialise Error
             return False, 0, 0, index
 
