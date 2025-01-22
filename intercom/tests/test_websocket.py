@@ -71,3 +71,37 @@ class TestWebSocket(unittest.TestCase):
 
         assert len(self.calls) == 1
         assert self.isValidAnswer(self.calls[0])
+
+    def test_hard_disconnect(self):
+        # Simulates as best as I can a network disconnection or a panic
+        def send_dummy():
+            requests.post("http://192.168.0.191:8000/new_message/test")
+
+        import multiprocessing
+
+        def setup_listener():
+            listener = WebSocketListener(endpoint_url="ws://192.168.0.191:8000/notify?messages")
+            listener_thread = listener.initialise()
+            listener_thread.start()
+
+        process1 = multiprocessing.Process(target=setup_listener)
+        process1.start()
+
+        sleep(1)
+
+        process1.terminate()
+
+        sleep(0.2)
+
+        send_dummy()  # Should trigger an IOError on SpaTch while trying to push the notif to the previously closed ws
+
+        process2 = multiprocessing.Process(target=setup_listener)
+        process2.start()
+
+        sleep(1)
+
+        send_dummy()
+        send_dummy()
+        send_dummy()
+
+        process2.terminate()
