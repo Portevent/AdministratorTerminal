@@ -19,11 +19,11 @@ class Template[T: Form](ABC):
         """
 
         try:
-            self.__print(printer)
+            self._print(printer)
         except PrinterException:
             return False
         return True
 
     @abstractmethod
-    def __print(self, printer: ThermalPrinter) -> None:
+    def _print(self, printer: ThermalPrinter) -> None:
         raise NotImplementedError()

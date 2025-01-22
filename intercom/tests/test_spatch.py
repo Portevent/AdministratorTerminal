@@ -80,3 +80,4 @@ class TestSpaTch(unittest.TestCase):
         other_message = database.fetchMessage(message2_id, discard_check=True)
         assert other_message is not None
         assert other_message == last_message
+
