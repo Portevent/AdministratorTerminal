@@ -35,7 +35,7 @@ def retrieveAndPrint(ws_message: str, database: SpaTchDatabase, printer: Thermal
         print("The sent response was incoherent")
         return
     except DatabaseError as e:
-        print("A database error occurred: {}".format(e))
+        print(f"A database error occurred: {e}")
         return
 
     try:
@@ -63,10 +63,10 @@ if __name__ == "__main__":
     db = SpaTchDatabase("http://192.168.0.191:8000/")
     db.checkConnection()
 
-    def callback(message: str) -> None:
+    def retrieveAndPrintCallback(message: str) -> None:
         retrieveAndPrint(message, db, printer_handle)
 
-    ws_notif.register_callback(callback)
+    ws_notif.register_callback(retrieveAndPrintCallback)
 
     ws_thread.start()
 
