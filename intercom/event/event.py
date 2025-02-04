@@ -1,8 +1,9 @@
-from typing import Callable
+from typing import Callable, List
 
 
 class EventListener[CT: Callable[[str], None]]:
-    callbacks: [[CT | None, bool]]
+    RegisteredCallback = List[CT | None | bool]
+    callbacks: List[RegisteredCallback]
 
     def __init__(self):
         self.callbacks = []
