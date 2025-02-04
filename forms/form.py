@@ -15,6 +15,7 @@ class Form(ABC):
     form_ver: int
 
     size_encode_width: int = 2
+    priorities: [str] = ["None", "Low", "Medium", "High", "Critical"]
 
     def getSignature(self) -> bytes:
         """
@@ -140,6 +141,18 @@ class Form(ABC):
         """
         return int.from_bytes(buffer[start_index:start_index + cls.size_encode_width],
                               byteorder="big"), start_index + cls.size_encode_width
+
+    @classmethod
+    def getPriorityFromIndex(cls, index) -> str:
+        """
+        Returns cls.priorities[index]
+        """
+
+        if index < len(cls.priorities):
+            return cls.priorities[index]
+
+        return f"Unknown with rank {index}"
+
 
     # TODO: Decide if we want that
     # @abstractmethod

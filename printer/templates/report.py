@@ -2,11 +2,11 @@ from printer.driver import ThermalPrinter
 from printer.templates.format import DefaultFormat
 from printer.templates.template import Template
 
-from forms.mission_form import MissionForm
+from forms.report_form import IncidentReportForm
 
 
 
-class MissionTemplate[T: MissionForm](Template[T]):
+class IncidentReportTemplate[T: IncidentReportForm](Template[T]):
     document: T
 
     def _print(self, printer: ThermalPrinter) -> None:
@@ -21,20 +21,20 @@ class MissionTemplate[T: MissionForm](Template[T]):
 
         printer.text("\n\n")
 
-        DefaultFormat.print_short_field(printer, "Filling date", "xx.xx.xxxx", end="\n")
+        DefaultFormat.print_short_field(printer, "Filling date", self.document.fillingDate, end="\n")
         DefaultFormat.print_short_field(printer, "Priority", self.document.getPriorityFromIndex(self.document.priority), end="\n\n")
 
-        DefaultFormat.print_short_field(printer, "Full source ID", "undefined", end="\n")
-        DefaultFormat.print_double_field(printer, "Status", "undef", "Dpt", "undef", end="\n\n")
-        DefaultFormat.print_short_field(printer, "Full dest ID", self.document.assigned_id, end="\n\n\n")
+        DefaultFormat.print_short_field(printer, "Full source ID", self.document.sourceID, end="\n")
+        DefaultFormat.print_double_field(printer, "Status", self.document.sourceStatus, "Dpt", self.document.sourceDept, end="\n\n")
+        DefaultFormat.print_short_field(printer, "Full dest ID", self.document.destID, end="\n\n\n")
 
-        DefaultFormat.print_long_field(printer, "Service Object", self.document.name, end="\n")
+        DefaultFormat.print_long_field(printer, "Issue Object", self.document.issueTitle, end="\n")
         DefaultFormat.print_long_field(printer, "Location", self.document.location, end="\n\n\n")
 
-        DefaultFormat.print_long_field(printer, "Description", self.document.description, end="\n\n\n")
+        DefaultFormat.print_long_field(printer, "Issue Description", self.document.issue, end="\n\n\n")
 
-        printer.set_with_default(bold=False)
-        printer.text(" [ ] Read   [ ] In progress   [ ] Done\n\n\n")
+        if self.document.proposal is not None:
+            DefaultFormat.print_long_field(printer, "Proposal", self.document.proposal, end="\n\n\n")
 
 
         printer.text("need to change barcode code xxxxxxxx\n")
