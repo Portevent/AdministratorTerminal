@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from typing import Self
 from forms.form import Form
+from forms.types.entity import Entity
 
 
 class MissionForm(Form):
@@ -12,7 +13,7 @@ class MissionForm(Form):
     form_id = 2
     form_ver = 1
 
-    assigned_id: str
+    assigned: Entity
     location: str
     name: str
     description: str
@@ -24,7 +25,7 @@ class MissionForm(Form):
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.assigned_id)
+        serialised += self._serializeString(self.assigned.getID())
         serialised += self._serializeString(self.location)
         serialised += self._serializeString(self.name)
         serialised += self._serializeString(self.description)
@@ -37,7 +38,9 @@ class MissionForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
         
-        res.assigned_id, index = cls._deserializeString(buffer, index)
+        destID, index = cls._deserializeString(buffer, index)
+        res.assigned.assigned = Entity.fromID(destID)
+
         res.location, index = cls._deserializeString(buffer, index)
         res.name, index = cls._deserializeString(buffer, index)
         res.description, index = cls._deserializeString(buffer, index, optionnal=True)
