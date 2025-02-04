@@ -13,9 +13,19 @@ class IncidentReportForm(Form):
     form_id = 1
     form_ver = 1
 
-    reportSourceID: str
-    location: str
+
+    fillingDate: str
+
+    sourceID: str
+    sourceStatus: str
+    sourceDept: str
+
+    destID: str
+
     issueTitle: str
+    location: str
+    issue: str
+
     proposal: str | None
     priority: int
 
@@ -24,9 +34,16 @@ class IncidentReportForm(Form):
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.reportSourceID)
-        serialised += self._serializeString(self.location)
+        serialised += self._serializeString(self.sourceID)
+        serialised += self._serializeString(self.sourceStatus)
+        serialised += self._serializeString(self.sourceDept)
+        serialised += self._serializeString(self.destID)
+        serialised += self._serializeString(self.fillingDate)
+
         serialised += self._serializeString(self.issueTitle)
+        serialised += self._serializeString(self.location)
+        serialised += self._serializeString(self.issue)
+
         serialised += self._serializeString(self.proposal)
         serialised += self._serialiseInt(self.priority)
 
@@ -36,9 +53,16 @@ class IncidentReportForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
 
-        res.reportSourceID, index = cls._deserializeString(buffer, index)
-        res.location, index = cls._deserializeString(buffer, index)
+        res.sourceID, index = cls._deserializeString(buffer, index)
+        res.sourceStatus, index = cls._deserializeString(buffer, index)
+        res.sourceDept, index = cls._deserializeString(buffer, index)
+        res.destID, index = cls._deserializeString(buffer, index)
+        res.fillingDate, index = cls._deserializeString(buffer, index)
+
         res.issueTitle, index = cls._deserializeString(buffer, index)
+        res.location, index = cls._deserializeString(buffer, index)
+        res.issue, index = cls._deserializeString(buffer, index)
+
         res.proposal, index = cls._deserializeString(buffer, index, optionnal=True)
         res.priority, index = cls._deserializeInt(buffer, index)
 
