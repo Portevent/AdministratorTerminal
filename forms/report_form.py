@@ -33,10 +33,12 @@ class IncidentReportForm(Form):
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.source.getID())
+        # serialised += self._serializeString(self.source.getID())
+        serialised += self._serializeString(self.source.serialise())
         serialised += self._serializeString(self.source.status)
         serialised += self._serializeString(self.source.dept)
-        serialised += self._serializeString(self.dest.getID())
+        # serialised += self._serializeString(self.dest.getID())
+        serialised += self._serializeString(self.dest.serialise())
         serialised += self._serializeString(self.fillingDate)
 
         serialised += self._serializeString(self.issueTitle)
@@ -52,14 +54,14 @@ class IncidentReportForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
 
-        source_id, index = cls._deserializeString(buffer, index)
-        res.source = Entity.fromID(source_id)
+        source_serd, index = cls._deserializeString(buffer, index)
+        res.source = Entity.deserialise(source_serd)
 
         res.sourceStatus, index = cls._deserializeString(buffer, index)
         res.sourceDept, index = cls._deserializeString(buffer, index)
 
-        dest_id, index = cls._deserializeString(buffer, index)
-        cls.dest = Entity.fromID(dest_id)
+        dest_serd, index = cls._deserializeString(buffer, index)
+        res.dest = Entity.deserialise(dest_serd)
 
         res.fillingDate, index = cls._deserializeString(buffer, index)
 

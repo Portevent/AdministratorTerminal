@@ -39,8 +39,8 @@ class MissionForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
         
-        dest_ser, index = cls._deserializeString(buffer, index)
-        res.assigned = Entity.deserialise(dest_ser)
+        dest_serd, index = cls._deserializeString(buffer, index)
+        res.assigned = Entity.deserialise(dest_serd)
 
         res.location, index = cls._deserializeString(buffer, index)
         res.name, index = cls._deserializeString(buffer, index)
