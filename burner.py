@@ -46,7 +46,7 @@ def retrieveAndPrint(ws_message: str, database: SpaTchDatabase, printer: Thermal
 
     try:
         filled_template = Filter.templateFromDocument(decoded_form)
-        filled_template.print(printer)
+        filled_template.print(printer, message_id)
     except NotImplementedError:
         print("This form isn't supported yet")
         return

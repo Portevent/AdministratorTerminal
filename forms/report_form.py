@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from typing import Self
 from forms.form import Form
+from forms.types.entity import Entity
 
 
 class IncidentReportForm(Form):
@@ -16,11 +17,9 @@ class IncidentReportForm(Form):
 
     fillingDate: str
 
-    sourceID: str
-    sourceStatus: str
-    sourceDept: str
+    source: Entity
 
-    destID: str
+    dest: Entity
 
     issueTitle: str
     location: str
@@ -29,22 +28,24 @@ class IncidentReportForm(Form):
     proposal: str | None
     priority: int
 
-    def serialize(self) -> str:
+    def serialise(self) -> str:
         serialised = bytes()
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.sourceID)
-        serialised += self._serializeString(self.sourceStatus)
-        serialised += self._serializeString(self.sourceDept)
-        serialised += self._serializeString(self.destID)
-        serialised += self._serializeString(self.fillingDate)
+        # serialised += self._serializeString(self.source.getID())
+        serialised += self._serialiseString(self.source.serialise())
+        serialised += self._serialiseString(self.source.status)
+        serialised += self._serialiseString(self.source.dept)
+        # serialised += self._serializeString(self.dest.getID())
+        serialised += self._serialiseString(self.dest.serialise())
+        serialised += self._serialiseString(self.fillingDate)
 
-        serialised += self._serializeString(self.issueTitle)
-        serialised += self._serializeString(self.location)
-        serialised += self._serializeString(self.issue)
+        serialised += self._serialiseString(self.issueTitle)
+        serialised += self._serialiseString(self.location)
+        serialised += self._serialiseString(self.issue)
 
-        serialised += self._serializeString(self.proposal)
+        serialised += self._serialiseString(self.proposal)
         serialised += self._serialiseInt(self.priority)
 
         return base64.b64encode(serialised).decode()
@@ -53,17 +54,22 @@ class IncidentReportForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
 
-        res.sourceID, index = cls._deserializeString(buffer, index)
-        res.sourceStatus, index = cls._deserializeString(buffer, index)
-        res.sourceDept, index = cls._deserializeString(buffer, index)
-        res.destID, index = cls._deserializeString(buffer, index)
-        res.fillingDate, index = cls._deserializeString(buffer, index)
+        source_serd, index = cls._deserialiseString(buffer, index)
+        res.source = Entity.deserialise(source_serd)
 
-        res.issueTitle, index = cls._deserializeString(buffer, index)
-        res.location, index = cls._deserializeString(buffer, index)
-        res.issue, index = cls._deserializeString(buffer, index)
+        res.sourceStatus, index = cls._deserialiseString(buffer, index)
+        res.sourceDept, index = cls._deserialiseString(buffer, index)
 
-        res.proposal, index = cls._deserializeString(buffer, index, optionnal=True)
-        res.priority, index = cls._deserializeInt(buffer, index)
+        dest_serd, index = cls._deserialiseString(buffer, index)
+        res.dest = Entity.deserialise(dest_serd)
+
+        res.fillingDate, index = cls._deserialiseString(buffer, index)
+
+        res.issueTitle, index = cls._deserialiseString(buffer, index)
+        res.location, index = cls._deserialiseString(buffer, index)
+        res.issue, index = cls._deserialiseString(buffer, index)
+
+        res.proposal, index = cls._deserialiseString(buffer, index, optionnal=True)
+        res.priority, index = cls._deserialiseInt(buffer, index)
 
         return res

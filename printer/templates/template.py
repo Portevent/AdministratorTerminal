@@ -11,7 +11,7 @@ class Template[T: Form](ABC):
     def __init__(self, document: T):
         self.document = document
 
-    def print(self, printer: ThermalPrinter) -> bool:
+    def print(self, printer: ThermalPrinter, oid: int | None = None) -> bool:
         """
         Prints the template with the given document.
         :param printer: The printer to use.
@@ -19,11 +19,11 @@ class Template[T: Form](ABC):
         """
 
         try:
-            self._print(printer)
+            self._print(printer, oid=oid)
         except PrinterException:
             return False
         return True
 
     @abstractmethod
-    def _print(self, printer: ThermalPrinter) -> None:
+    def _print(self, printer: ThermalPrinter, oid: int | None = None) -> None:
         raise NotImplementedError()

@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 from typing import Self
 from forms.form import Form
+from forms.types.entity import Entity
 
 
 class MissionForm(Form):
@@ -12,23 +13,24 @@ class MissionForm(Form):
     form_id = 2
     form_ver = 1
 
-    assigned_id: str
+    assigned: Entity
     location: str
     name: str
     description: str
-    tasks: str | None
+    tasks: str | None = None
     priority: int
 
-    def serialize(self) -> str:
+    def serialise(self) -> str:
         serialised = bytes()
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.assigned_id)
-        serialised += self._serializeString(self.location)
-        serialised += self._serializeString(self.name)
-        serialised += self._serializeString(self.description)
-        serialised += self._serializeString(self.tasks)
+        # serialised += self._serializeString(self.assigned.serialise())
+        serialised += self._serialiseString(self.assigned.serialise())
+        serialised += self._serialiseString(self.location)
+        serialised += self._serialiseString(self.name)
+        serialised += self._serialiseString(self.description)
+        serialised += self._serialiseString(self.tasks)
         serialised += self._serialiseInt(self.priority)
 
         return base64.b64encode(serialised).decode()
@@ -37,11 +39,13 @@ class MissionForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
         
-        res.assigned_id, index = cls._deserializeString(buffer, index)
-        res.location, index = cls._deserializeString(buffer, index)
-        res.name, index = cls._deserializeString(buffer, index)
-        res.description, index = cls._deserializeString(buffer, index, optionnal=True)
-        res.tasks, index = cls._deserializeString(buffer, index, optionnal=True)
-        res.priority, index = cls._deserializeInt(buffer, index)
+        dest_serd, index = cls._deserialiseString(buffer, index)
+        res.assigned = Entity.deserialise(dest_serd)
+
+        res.location, index = cls._deserialiseString(buffer, index)
+        res.name, index = cls._deserialiseString(buffer, index)
+        res.description, index = cls._deserialiseString(buffer, index, optionnal=True)
+        res.tasks, index = cls._deserialiseString(buffer, index, optionnal=True)
+        res.priority, index = cls._deserialiseInt(buffer, index)
 
         return res
