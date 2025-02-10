@@ -1,7 +1,9 @@
 import base64
 import os
 import unittest
+from random import randint
 
+from forms.deserialiser import deserialiseFromEncoded
 from forms.mission_form import MissionForm
 from forms.types.entity import Replika
 
@@ -12,11 +14,11 @@ class TestMissionForm(unittest.TestCase):
         # Stupid hash function to test messages
         return base64.b64encode(os.urandom(256)).decode().replace("/", "").replace("+", "")
 
-    def test_ser_deser(self):
+    def genRandom(self, model_type="STAR", priority=None) -> MissionForm:
         form = MissionForm()
 
         dest = Replika()
-        dest.modelType = "STAR"
+        dest.modelType = model_type
         dest.assignedLocation = self.genHash()[:3]
         dest.rank = self.genHash()[:2]
         dest.status = self.genHash()[:15]
@@ -25,27 +27,54 @@ class TestMissionForm(unittest.TestCase):
         form.assigned = dest
         form.name = self.genHash()[:25]
         form.location = self.genHash()[:25]
-        form.priority = 5
+        form.priority = priority or randint(1, 5)
         form.description = self.genHash()[:25]
 
-        serialized = form.serialise()
+        return form
 
-        assert serialized is not None
+    def test_ser_deser(self):
+        form = self.genRandom()
 
-        deserialized = form.deserialise(serialized)
+        serialised = form.serialise()
 
-        assert deserialized is not None
+        assert serialised is not None
 
-        assert deserialized.assigned is not None
-        assert type(deserialized.assigned) == type(form.assigned)
-        assert deserialized.assigned.modelType == form.assigned.modelType
-        assert deserialized.assigned.assignedLocation == form.assigned.assignedLocation
-        assert deserialized.assigned.rank == form.assigned.rank
-        assert deserialized.assigned.status == form.assigned.status
-        assert deserialized.assigned.dept == form.assigned.dept
-        assert deserialized.assigned.getID() == form.assigned.getID()
+        deserialised = MissionForm.deserialise(serialised)
 
-        assert deserialized.name == form.name
-        assert deserialized.location == form.location
-        assert deserialized.priority == form.priority
-        assert deserialized.description == form.description
+        assert deserialised is not None
+
+        # Note: modelType and rank are Replika-specific
+        assert deserialised.assigned is not None
+        assert type(deserialised.assigned) == type(form.assigned)
+        assert deserialised.assigned.modelType == form.assigned.modelType
+        assert deserialised.assigned.assignedLocation == form.assigned.assignedLocation
+        assert deserialised.assigned.rank == form.assigned.rank
+        assert deserialised.assigned.status == form.assigned.status
+        assert deserialised.assigned.dept == form.assigned.dept
+        assert deserialised.assigned.getID() == form.assigned.getID()
+
+        assert deserialised.name == form.name
+        assert deserialised.location == form.location
+        assert deserialised.priority == form.priority
+        assert deserialised.description == form.description
+
+    def test_ser_deser2(self):
+        form1 = self.genRandom(priority=1)
+        form2 = self.genRandom(priority=3)
+
+        serialised1 = form1.serialise()
+        serialised2 = form2.serialise()
+
+        assert serialised1 is not None
+        assert serialised2 is not None
+
+        deserialised1 = MissionForm.deserialise(serialised1)
+        deserialised2 = MissionForm.deserialise(serialised2)
+
+        assert deserialised1 is not None
+        assert deserialised2 is not None
+
+        assert not deserialised1.name == deserialised2.name
+        assert not deserialised1.location == deserialised2.location
+        assert not deserialised1.priority == deserialised2.priority
+        assert not deserialised1.description == deserialised2.description
