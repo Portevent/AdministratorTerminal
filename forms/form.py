@@ -25,7 +25,7 @@ class Form(ABC):
         return b"F" + self._serialiseInt(self.form_id) + self._serialiseInt(self.form_ver)
 
     @abstractmethod
-    def serialize(self) -> str:
+    def serialise(self) -> str:
         """
         Serialise the form into a base64 string
         :return: base64 string
@@ -34,7 +34,7 @@ class Form(ABC):
         raise NotImplementedError
 
     @classmethod
-    def deserialize(cls, serialised: str) -> Self:
+    def deserialise(cls, serialised: str) -> Self:
         """
         Deserialise a string into a Form
         :param serialised: base64 string
@@ -68,8 +68,8 @@ class Form(ABC):
             raise FormatError("The form data isn't starting with an F :(")
 
         index += 1
-        unpacked_form_id, index = cls._deserializeInt(buffer, index)
-        unpacked_form_ver, index = cls._deserializeInt(buffer, index)
+        unpacked_form_id, index = cls._deserialiseInt(buffer, index)
+        unpacked_form_ver, index = cls._deserialiseInt(buffer, index)
 
         return unpacked_form_id, unpacked_form_ver, index
 
@@ -100,7 +100,7 @@ class Form(ABC):
         return True, index
 
     @classmethod
-    def _serializeString(cls, buff: str | None) -> bytes:
+    def _serialiseString(cls, buff: str | None) -> bytes:
         """
         Serialise a string to a buffer, see _deserialiseString for the format, 0x0000 if string is None
         :param buff: string to serialise
@@ -117,7 +117,7 @@ class Form(ABC):
         return val.to_bytes(cls.size_encode_width, 'big')
 
     @classmethod
-    def _deserializeString(cls, buffer: bytes, start_index: int, optionnal: bool = False) -> (str, int):
+    def _deserialiseString(cls, buffer: bytes, start_index: int, optionnal: bool = False) -> (str, int):
         """
         Deserialise a buffer formatted as 0xaaaabbbbbbbbbbbbbbbb (aaaa being the length of the bbbbbbb section)
         :param buffer: buffer to deserialise
@@ -125,14 +125,14 @@ class Form(ABC):
         :return: deserialised string and the new index
         """
 
-        size, index = cls._deserializeInt(buffer, start_index)
+        size, index = cls._deserialiseInt(buffer, start_index)
         if optionnal and size == 0:
             return None, index
 
         return buffer[index:index + size].decode(), index + size
 
     @classmethod
-    def _deserializeInt(cls, buffer: bytes, start_index: int) -> (int, int):
+    def _deserialiseInt(cls, buffer: bytes, start_index: int) -> (int, int):
         """
         Deserialise a int
         :param buffer: buffer to deserialise

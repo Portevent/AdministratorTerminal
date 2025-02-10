@@ -28,11 +28,11 @@ class TestMissionForm(unittest.TestCase):
         form.priority = 5
         form.description = self.genHash()[:25]
 
-        serialized = form.serialize()
+        serialized = form.serialise()
 
         assert serialized is not None
 
-        deserialized = form.deserialize(serialized)
+        deserialized = form.deserialise(serialized)
 
         assert deserialized is not None
 
