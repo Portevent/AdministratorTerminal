@@ -17,7 +17,7 @@ class MissionForm(Form):
     location: str
     name: str
     description: str
-    tasks: str | None
+    tasks: str | None = None
     priority: int
 
     def serialize(self) -> str:
@@ -25,7 +25,8 @@ class MissionForm(Form):
 
         serialised += self.getSignature()
 
-        serialised += self._serializeString(self.assigned.getID())
+        # serialised += self._serializeString(self.assigned.serialise())
+        serialised += self._serializeString(self.assigned.serialise())
         serialised += self._serializeString(self.location)
         serialised += self._serializeString(self.name)
         serialised += self._serializeString(self.description)
@@ -38,8 +39,8 @@ class MissionForm(Form):
     def _unpack(cls, buffer: bytes, index: int) -> Self:
         res = cls()
         
-        destID, index = cls._deserializeString(buffer, index)
-        res.assigned.assigned = Entity.fromID(destID)
+        dest_ser, index = cls._deserializeString(buffer, index)
+        res.assigned = Entity.deserialise(dest_ser)
 
         res.location, index = cls._deserializeString(buffer, index)
         res.name, index = cls._deserializeString(buffer, index)
